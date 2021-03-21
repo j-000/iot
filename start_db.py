@@ -2,7 +2,7 @@ from models import (
     Entry,   # Need to import to create
     Base
 )
-from app import engine
+from server import engine
 
 
 def main():
