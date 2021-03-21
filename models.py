@@ -28,3 +28,6 @@ class Entry(Base):
         self.data = data
         db.add(self)
         db.commit()
+
+    def __repr__(self):
+        return f'{self.id} - {self.data}'

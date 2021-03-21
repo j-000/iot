@@ -8,5 +8,24 @@
   <h1>IOT - Internet of Things</h1>
   <h2>iot.joalex.dev</h2>
   <p>Comming soon...</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Timestamp</th>
+        <th>Data</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for e in entries %}
+      <tr>
+        <td>{{ e.id }}</td>
+        <td>{{ e.timestamp }}</td>
+        <td>{{ e.data }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
 </body>
 </html>
