@@ -22,8 +22,7 @@ def projects():
 @app.route('/entries')
 def entries():
     entries = Entry.query.all()
-    # todo: complete
-    return render_template('index.html')
+    return render_template('entries.html', entries=entries)
 
 
 @app.route('/u')

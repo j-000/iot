@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<ul>
+  {% for e in entries %}
+  <li>{{ e.id }} {{ e.timestamp }} {{ e.data }}</li>
+  {% endfor %}
+</ul>
+
+{% endblock %}
