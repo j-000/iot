@@ -1,31 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>IOT Home | Internet of Things | Freelance | Hire me - hello@joalex.dev</title>
-</head>
-<body>
-  <h1>IOT - Internet of Things</h1>
-  <h2>iot.joalex.dev</h2>
-  <p>Coming soon...</p>
+{% extends "layout.html" %}
 
-  <table>
-    <thead>
-      <tr>
-        <th>Id</th>
-        <th>Timestamp</th>
-        <th>Data</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% for e in entries %}
-      <tr>
-        <td>{{ e.id }}</td>
-        <td>{{ e.timestamp }}</td>
-        <td>{{ e.data }}</td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-</body>
-</html>
+{% block title %}
+<title>Home | IOT Internet of Things | iot.joalex.dev |Hire me - hello@joalex.dev</title>
+{% endblock %}
+
+{% block body %}
+    <div class="jumbotron mt-3">
+      <h1 class="text-success">Internet of Things</h1>
+      <p class="lead">On the 1st March 2021 I started learning more about micro-controllers, integrated circuits and micro-computers. My newly found
+      hobby involves software and hardware programing at the lowest bit level.</p>
+      <p class="lead">Being a Computer Science student, and more familiar with the Software side of things, programming micro-controllers has proven to be challenging at times.</p>
+      <p class="lead">I have learned so much already that I can't wait to share it all with you. I hope you enjoy reading about my projects, what obstacles I found and how I managed to solve them.</p>
+      <p class="lead">If I encourage you to try it out, please send me pictures of your projects to <span class="bg-success pl-2 pr-2 text-white">hello@joalex.dev</span></p>
+      <p class="lead">
+        <a class="btn btn-success btn-lg" href="/projects" role="button">See Projects</a>
+      </p>
+    </div>
+    <h2>Components</h2>
+    <div class="row">
+      <div class="col-lg-6 mt-3 text-center">
+        <img class="img-fluid border border-dark" src="{{ url_for('static', filename='1.png') }}" alt="Image 1 - Many electronic components">
+      </div>
+      <div class="col-lg-6 mt-5">
+        <img class="img-fluid border border-dark mt-5" src="{{ url_for('static', filename='2.png') }}" alt="Image 2 - Many electronic components">
+        <br>
+        <p class="lead mt-5">... more components</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-4 mt-5">
+        <p class="lead mt-5"> ... yet more components</p>
+      </div>
+      <div class="col-lg-8 mt-5 text-center">
+        <img class="img-fluid border border-dark" src="{{ url_for('static', filename='4.png') }}" alt="Image 4 - Many electronic components">
+      </div>
+    </div>
+    <div class="row mb-5">
+      <div class="col-lg-10 mt-5 text-center">
+        <img class="img-fluid border border-dark" src="{{ url_for('static', filename='3.png') }}" alt="Image 3 - Many electronic components">
+      </div>
+      <div class="col-lg-2 mt-5">
+        <p class="lead mt-5">...</p>
+      </div>
+    </div>
+    <div class="row mb-5">
+      <div class="col-lg-10 mt-5 text-center">
+        <img class="img-fluid border border-dark" src="{{ url_for('static', filename='5.png') }}" alt="Image 5 - Many electronic components">
+      </div>
+      <div class="col-lg-2 mt-5">
+        <p class="lead mt-5">... and more components</p>
+      </div>
+    </div>
+{% endblock %}

@@ -21,7 +21,7 @@ class Entry(Base):
 
     query = db.query_property()
     id = Column(Integer, primary_key=True)
-    timestamp = Column(DateTime(), default=datetime.datetime.utcnow())
+    timestamp = Column(DateTime(), default=datetime.datetime.utcnow)
     data = Column(Text())
 
     def __init__(self, data):

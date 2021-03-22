@@ -1,0 +1,275 @@
+{% extends "layout.html" %}
+{% block title %}
+<title>Projects | IOT Internet of Things | iot.joalex.dev |Hire me - hello@joalex.dev</title>
+{% endblock %}
+
+{% block body %}
+<h1 class="mt-5 text-success">Greenhouse Temperature and Humidity Online Dashboard</h1>
+<div class="alert alert-warning" style="opacity:0.7">Please note, none of the links herein in the article are affiliated. I do not endorse any of the products mentioned nor do I profit if you buy them.</div>
+<div class="alert alert-info mt-3" style="opacity:0.7">I expect you to be familiar with programming in c++ and basic Arduino tasks.</div>
+<div class="row mt-5">
+  <div class="col-lg-5">
+    <p class="lead">This is our greenhouse. Inside you can find Cherry trees, Lemon trees, Orange trees, micro-greens, other fruit trees, some vegetables, you name it! All looking for that perfect balance
+      between temperature and moisture. </p>
+    <p class="lead"> Too hot, too cold, too humid or too dry isn't good.</p>
+    <p class="lead">So I decided to build an online dashboard that I can use to monitor the temperature and humidity levels inside. </p>
+    <p class="lead">I promise you, it has <em>not</em> been an easy task!</p>
+  </div>
+  <div class="col-lg-7 text-center">
+    <img class="img-fluid border border-dark" style="max-height:700px;" src="{{ url_for('static', filename='11.jpeg') }}" alt="Greenhouse - picture 3">
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <h2>The big picture</h2>
+    <p class="lead">The idea is simple - record the temperature and humidity values inside the greenhouse, send that data via wifi to a webserver and display it on a nice looking webpage.</p>
+    <p class="lead">You may think "oh, that is easy"... but just keep reading. I wouldn't want to spoil any of the "fun" moments I had.</p>
+  </div>
+</div>
+<div class="row mt-4">
+  <div class="col">
+    <h2>Parts required</h2>
+    <p class="lead"></p>
+    <p class="lead">After much research, I realised I needed to buy quite a few items. I decided to buy the
+      <a href="https://www.elegoo.com/products/elegoo-uno-project-super-starter-kit" target="_blank">Elegoo Starter Kit</a> which comes with quite a few components.</p>
+    <p class="lead">Among these components, there's a single <a href="https://components101.com/sensors/dht11-temperature-sensor" target="_blank">DHT11</a> temperature and humidity sensor, various resistors, jump wires and a thermistor. This is pretty much
+    almost everything we need. The star of the show is the <a href="https://www.az-delivery.uk/products/nodemcu" target="_blank">micro-controller NodeMCU 12F</a>.</p>
+    <p class="lead">The hardware components required are:</p>
+    <ul>
+      <li>1x NodeMCU 12F micro-controller</li>
+      <li>1x 10k Ohm resistor</li>
+      <li>1x 10k Ohm thermistor</li>
+      <li>1x DHT11 sensor</li>
+    </ul>
+  </div>
+</div>
+<div class="row mt-4">
+  <div class="col">
+    <h2>NodeMCU, ESP8266, ESP32, ... what?</h2>
+    <p class="lead">If you are anxious like me, and decide to just jump at it and connect things without reading first, you will likely face some confusion in the long run.</p>
+    <p class="lead"><a href="https://www.nodemcu.com/index_en.html" target="_blank">NodeMCU</a> is the name of a firmware originally made for the
+      <a href="https://en.wikipedia.org/wiki/ESP8266" target="_blank">ESP8266 micro-chip</a> and more recently with support made for <a
+              href="https://en.wikipedia.org/wiki/ESP32" target="_blank">ESP32</a>.</p>
+    <p class="lead">The ESP8266 (8 pin), also referred to as ESP-01, is an old version and to program this you need to learn some complicated
+      <a href="https://www.espressif.com/sites/default/files/documentation/4a-esp8266_at_instruction_set_en.pdf" target="_blank">ATtention (AT) commands</a>.</p>
+    <p class="lead">Personally, I haven only been able to connect to WiFi and ensuring it stays on via AT commands - still learning how to make HTTP get requests.</p>
+    <p class="lead">Now, the <a href="https://www.az-delivery.uk/products/nodemcu" target="_blank">NodeMCU 12F</a> uses the same wifi chip - ESP8266. The ESP32 is the successor of the ESP8266 and has extra features like Bluetooth. NodeMCU 12F does not have Bluetooth.</p>
+  </div>
+</div>
+<div class="row mt-4">
+  <div class="col">
+    <h2>The Connection</h2>
+    <p class="lead">Now that we have the parts, we need to connect them. The following diagram illustrates how I connected the components.</p>
+    <img class="img-fluid border border-dark" style="max-height:700px;" src="{{ url_for('static', filename='7.png') }}" alt="Schematics">
+  </div>
+</div>
+<div class="row mt-4">
+  <div class="col">
+    <h2>To IDE or not to IDE?</h2>
+    <p class="lead">Initially I used Arduido IDE to write and upload the code to the micro-controllers. After watching a few videos on YouTube (checkout the
+      <a href="https://www.youtube.com/channel/UCzml9bXoEM0itbcE96CB03w" target="_blank">DroneBot Workshop</a>) I realized
+      <a href="https://platformio.org/" target="_blank">PlatformIO</a> is a better alternative and experience.</p>
+    <p class="lead">Feel free to use whichever you prefer.</p>
+  </div>
+</div>
+<div class="row mt-4">
+  <div class="col">
+    <h2>The Programming</h2>
+    <p class="lead">Now this is where the fun begins. Let's start by connecting the micro-controller to the laptop using a micro-USB cable. Open your IDE (I am using PlatformIO)
+    and create a new project.</p>
+    <p class="lead">Let's create the functions that read the temperature from the thermistor and temperature and humidity from the DHT11.</p>
+    <p class="lead">Reading from the analog pin 0 (to read the thermistor) doesn't require any external libraries. So let's create that function first. </p>
+    <pre>
+      // c++ main.cpp
+
+      String getThermTemperature(){
+          double Vout, Rth, temperature, adc_value;
+          const double VCC = 3.3;
+          const double adc_resolution = 1023;
+
+          // The resistor's value
+          const double R2 = 10000;
+
+          // These are constants required to calculate the temperature from the analog signal.
+          const double A = 0.001129148;
+          const double B = 0.000234125;
+          const double C = 0.0000000876741;
+
+          // Read the thermistor
+          adc_value = analogRead(A0);
+
+          // Calculate temperature in Celsius
+          Vout = (adc_value * VCC) / adc_resolution;
+          Rth = (VCC * R2 / Vout) - R2;
+          temperature = (1 / (A + (B * log(Rth)) + (C * pow((log(Rth)),3))));
+          temperature = temperature - 273.15;
+
+          return String(temperature);
+      }
+    </pre>
+    <p class="lead">Great. Now let's take care of reading from the DHT11 sensor. For this part we need to include an external library. On top of your main.cpp file add:</p>
+    <pre>
+      #include &lt;DHT.h&gt;
+      #define dhtpin D2         // The pin we connected the signal cable from DHT11
+      #define dhttype DHT11
+
+      DHT dht(dhtpin, dhttype); // Initialize the DHT sensor
+    </pre>
+    <p class="lead">We should now be able to read from both sensors. Let's try that first and then come back to setup the WiFi.</p>
+    <p class="lead">In your setup() function add the following.</p>
+    <pre>
+      void setup(){
+          Serial.begin(9600);
+          dht.begin();
+      }
+    </pre>
+    <p class="lead">And in your loop() function add the following.</p>
+    <pre>
+      void loop(){
+        // Important - DHT11 is a rather slow sensor and can take up to 2 seconds to read. So once you read from the
+        // sensor, you should ideally wait. I prefer to wait 5 second, but feel free to wait more or less.
+
+        String therm_temp = getThermTemperature();
+
+        float t = dht.readTemperature();
+        delay(5000);
+        float h = dht.readHumidity();
+        delay(5000);
+
+        Serial.println("Therm temp: " + therm_temp);
+        Serial.println("T: " + String(t));
+        Serial.println("H: " + String(h));
+      }
+    </pre>
+    <p class="lead">Compile and upload. Open the serial monitor and check the results. You should see something like:</p>
+    <pre>
+      Therm temp: 18.90
+      T: 20.01
+      H: 57.00
+      ...
+    </pre>
+    <p class="lead">Fantastic! Cool stuff, right? Now let's connect the controller to the WiFi and make it send the data periodically to a web server.</p>
+    <p class="lead">If you don't have a web server, you can create one quickly with <a href="https://flask.palletsprojects.com/en/1.1.x/">Python Flask</a> and then use <a href="https://www.heroku.com/">Heroku</a> to host in on the internet.</p>
+  </div>
+</div>
+<div class="row mt-4">
+  <div class="col">
+    <h2>HTTPS / SSL</h2>
+    <p class="lead">We need to include the following libraries. Make sure you install them first.</p>
+    <pre>
+      #include &lt;ESP8266WiFi.h&gt;
+      #include &lt;ESP8266HTTPClient.h&gt;
+    </pre>
+    <p class="lead">You will have access to a a few important classes from these libraries. Let's create two functions, one that tests the wifi is connected and another that
+    connects to the wifi.</p>
+    <pre>
+      boolean wifiIsOn(){
+        // Tests connection
+        return WiFi.status() == WL_CONNECTED;
+      }
+
+      void connectToWifi(){
+        // Try to connect to wifi every 10s
+        while(!wifiIsOn()){
+          WiFi.begin("YOUR_WIFI_NAME (SSID)","YOUR_WIFI_PASSWORD");
+          delay(10000);
+          Serial.println("Connected!");
+        }
+      }
+    </pre>
+    <p class="lead">The connectToWifi() function will attempt connection every 10 seconds if the wifi is down.</p>
+    <p class="lead">Now we need to try it out.</p>
+    <pre>
+      void loop(){
+        if(!wifiIsOn()){
+          connectToWifi();
+        }
+
+        // Important - DHT11 is a rather slow sensor and can take up to 2 seconds to read. So once you read from the
+        // sensor, you should ideally wait. I prefer to wait 5 second, but feel free to wait more or less.
+        String therm_temp = getThermTemperature();
+
+        float t = dht.readTemperature();
+        delay(5000);
+        float h = dht.readHumidity();
+        delay(5000);
+
+        Serial.println("Therm temp: " + therm_temp);
+        Serial.println("T: " + String(t));
+        Serial.println("H: " + String(h));
+      }
+    </pre>
+    <p class="lead">Once again, compile and upload. Open serial monitor and check results.</p>
+    <pre>
+      Connected!
+    </pre>
+    <p class="lead">Finaly, we just need to create a function to send the data to the server. My server is located at iot.joalex.dev and I have configured a route
+    to receive the data as query parameters in the URL via GET requests.</p>
+    <p class="lead">My new function looks like this:</p>
+    <pre>
+      String sendGetRequest(String url){
+        // Parameters are in the URL string
+        HTTPClient http;
+        WiFiClientSecure client;
+
+        client.connect("iot.joalex.dev", 443);
+
+        // Comment out the one you do not use.
+
+        // For HTTPS connections
+        http.begin("iot.joalex.dev", 443, url, ssl_thumbprint);
+
+        // For HTTP connections
+        http.begin(url);
+
+        int httpCode = http.GET();
+
+        Serial.println("http code: " + String(httpCode));
+
+        if (httpCode > 0){
+          String payload = http.getString();
+          return payload;
+        }
+
+        http.end();
+        delay(1000);
+        return "";
+      }
+    </pre>
+    <p class="lead">Now here is where things got messy. If you are sending data to the server via HTTP, then skip ahead. Otherwise know that you need to obtain your
+    server's SSL certificate SHA1 fingerprint. You can do that in any browser by checking the SSL certificate. The thumbprint should have its hexadecimal characters separated by spaces.</p>
+    <p class="lead">If your thumbprint is "70d37f7e834d7de2f99a3e8f9a978aa25ccff7ee" then add "70 d3 7f 7e 83 4d 7d e2 f9 9a 3e 8f 9a 97 8a a2 5c cf f7 ee".</p>
+  </div>
+</div>
+<div class="row mt-4">
+  <div class="col">
+    <h2>Onto Reddit</h2>
+    <p class="lead">I faced this issue for a while and wasn't able to solve it until I posted on reddit.</p>
+    <p class="lead"><a href="https://www.reddit.com/r/esp8266/comments/ma8kge/httpclient_https_get_request/" target="_blank">Here is the post.</a></p>
+  </div>
+</div>
+<div class="row mt-4">
+  <div class="col">
+    <h2>{"success": True}</h2>
+    <p class="lead">At last, success. After 2 days of not being able to send the data through HTTPS, I finally managed.</p>
+    <p class="lead">Here is a nice gif video showing the NodeMCU micro-controller connected and programmed reading and sending the data from the sensors to my web server
+      at iot.joalex.dev.</p>
+    <img class="img-fluid border border-dark" src="{{ url_for('static', filename='iot.gif') }}" alt="">
+  </div>
+</div>
+<div class="row mt-4">
+  <div class="col">
+    <h2>EC2, Docker, Flask and SQLite</h2>
+    <p class="lead">The web server runs on EC2 t2.medium, and I used Flask to create a bare bones server for iot.joalex.dev. Nginx takes cares of load balancing the Docker containers
+    running the apps. For the database, I use an SQLite file shared between the Docker containers.</p>
+    <p class="lead">I still need to program the dashboard but that is the easy part now. I have had so much fun writing this project and I hope you enjoyed reading about it.</p>
+  </div>
+</div>
+<div class="row mt-4">
+  <div class="col">
+    <h2>Final words</h2>
+    <p class="lead">I still need to complete some tasks. I recently bought some cheap PCB from Amazon and will be soldering the components to a board to set it up in the greenhouse.</p>
+    <p class="lead">Lastly, I really enjoyed this project and learned quite a lot about micro-controllers and c++. Will consider doing another similar project sometime in the future.</p>
+  </div>
+</div>
+{% endblock %}
