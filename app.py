@@ -9,6 +9,12 @@ from server import app
 
 @app.route('/')
 def home():
+    entries = Entry.query.all()
+    return render_template('index.html', entries=entries)
+
+
+@app.route('/u')
+def data():
     if request.args:
         data = ''
         for key_name, value in request.args.items():
@@ -20,7 +26,6 @@ def home():
         except Exception as e:
             return jsonify(success=False, message=e)
         return jsonify(success=True)
-
     entries = Entry.query.all()
     return render_template('index.html', entries=entries)
 
